@@ -1,6 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { Task } from '../models/task.interface';
+import { Task } from '../models/task.model';
+import {AppDataSource} from "../data-source";
+
+const taskRepository = AppDataSource.getRepository(Task)
 
 const router = Router();
 let tasks: Task[] = [];
@@ -11,12 +14,15 @@ const taskValidationRules = [
     body('completed').isBoolean().withMessage('Completed must be a boolean'),
 ];
 
-router.get('/', (req: Request, res: Response) => {
-    res.json(tasks);
+router.get('/', async (req: Request, res: Response) => {
+    const tasks = await taskRepository.find()
+    res.json(tasks)
 });
 
-router.get('/:id', (req: Request, res: Response) => {
-    const task = tasks.find((t) => t.id === parseInt(req.params.id));
+router.get('/:id', async (req: Request, res: Response) => {
+    const task = await taskRepository.findOneBy({
+        id: parseInt(req.params.id)
+    })
 
     if (!task) {
         res.status(404).send('Task not found');
@@ -26,26 +32,27 @@ router.get('/:id', (req: Request, res: Response) => {
 });
 
 
-router.post('/', taskValidationRules, (req: Request, res: Response) => {
+router.post('/', taskValidationRules, async     (req: Request, res: Response) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const task: Task = {
-        id: tasks.length + 1,
-        title: req.body.title,
-        description: req.body.description,
-        completed: req.body.completed,
-    };
+    const task = new Task()
+    task.title = req.body.title
+    task.description = req.body.description
+    task.completed =req.body.completed
 
-    tasks.push(task);
+    await taskRepository.save(task);
+
     res.status(201).json(task);
 });
 
-router.put('/:id',  taskValidationRules, (req: Request, res: Response) => {
-    const task = tasks.find((t) => t.id === parseInt(req.params.id));
+router.put('/:id',  taskValidationRules, async (req: Request, res: Response) => {
+    const task = await taskRepository.findOneBy({
+        id: parseInt(req.params.id)
+    })
 
     if (!task) {
         res.status(404).send('Task not found');
@@ -54,17 +61,21 @@ router.put('/:id',  taskValidationRules, (req: Request, res: Response) => {
         task.description = req.body.description || task.description;
         task.completed = req.body.completed || task.completed;
 
+        await taskRepository.save(task)
+
         res.json(task);
     }
 });
 
-router.delete('/:id', (req: Request, res: Response) => {
-    const index = tasks.findIndex((t) => t.id === parseInt(req.params.id));
+router.delete('/:id', async (req: Request, res: Response) => {
+    const task = await taskRepository.findOneBy({
+        id: parseInt(req.params.id)
+    })
 
-    if (index === -1) {
+    if (!task) {
         res.status(404).send('Task not found');
     } else {
-        tasks.splice(index, 1);
+        await taskRepository.remove(task)
         res.status(204).send();
     }
 });
