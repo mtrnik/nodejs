@@ -1,4 +1,5 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm"
+import {Column, Entity, ManyToOne, PrimaryGeneratedColumn} from "typeorm"
+import {Author} from "./author.model";
 
 @Entity()
 export class Task {
@@ -13,4 +14,9 @@ export class Task {
 
     @Column()
     completed: boolean;
+
+    @ManyToOne(() => Author, (author) => author.tasks, {
+        cascade: true,
+    })
+    author: Author
 }

@@ -2,11 +2,12 @@ import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { Task } from '../models/task.model';
 import {AppDataSource} from "../data-source";
+import {Author} from "../models/author.model";
 
+const authorRepository = AppDataSource.getRepository(Author)
 const taskRepository = AppDataSource.getRepository(Task)
 
 const router = Router();
-let tasks: Task[] = [];
 
 const taskValidationRules = [
     body('title').notEmpty().withMessage('Title is required'),
@@ -39,10 +40,13 @@ router.post('/', taskValidationRules, async     (req: Request, res: Response) =>
         return res.status(400).json({ errors: errors.array() });
     }
 
+    const author = await authorRepository.findOneBy({id: 1})
+
     const task = new Task()
     task.title = req.body.title
     task.description = req.body.description
-    task.completed =req.body.completed
+    task.completed = req.body.completed
+    task.author = author
 
     await taskRepository.save(task);
 
