@@ -1,13 +1,12 @@
 import "reflect-metadata"
 import { DataSource } from "typeorm"
 
-import {Task} from "./models/task.model";
-import {Author} from "./models/author.model";
+import {Task, Author, User} from "./models";
 
 export const AppDataSource = new DataSource({
     type: "sqlite",
     database: "test.db",
-    entities: [Task, Author],
+    entities: [Task, Author, User],
     synchronize: true,
     logging: true,
     migrations: [],

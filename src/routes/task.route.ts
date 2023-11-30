@@ -1,26 +1,24 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { Task } from '../models/task.model';
+import { Author, Task } from '../models';
 import {AppDataSource} from "../data-source";
-import {Author} from "../models/author.model";
 
 const authorRepository = AppDataSource.getRepository(Author)
 const taskRepository = AppDataSource.getRepository(Task)
 
-const router = Router();
+export const taskRouter = Router();
 
 const taskValidationRules = [
     body('title').notEmpty().withMessage('Title is required'),
     body('description').notEmpty().withMessage('Description is required'),
-    body('completed').isBoolean().withMessage('Completed must be a boolean'),
 ];
 
-router.get('/', async (req: Request, res: Response) => {
+taskRouter.get('/', async (req: Request, res: Response) => {
     const tasks = await taskRepository.find()
     res.json(tasks)
 });
 
-router.get('/:id', async (req: Request, res: Response) => {
+taskRouter.get('/:id', async (req: Request, res: Response) => {
     const task = await taskRepository.findOneBy({
         id: parseInt(req.params.id)
     })
@@ -33,7 +31,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 });
 
 
-router.post('/', taskValidationRules, async     (req: Request, res: Response) => {
+taskRouter.post('/', taskValidationRules, async     (req: Request, res: Response) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -45,7 +43,6 @@ router.post('/', taskValidationRules, async     (req: Request, res: Response) =>
     const task = new Task()
     task.title = req.body.title
     task.description = req.body.description
-    task.completed = req.body.completed
     task.author = author
 
     await taskRepository.save(task);
@@ -53,7 +50,7 @@ router.post('/', taskValidationRules, async     (req: Request, res: Response) =>
     res.status(201).json(task);
 });
 
-router.put('/:id',  taskValidationRules, async (req: Request, res: Response) => {
+taskRouter.put('/:id',  taskValidationRules, async (req: Request, res: Response) => {
     const task = await taskRepository.findOneBy({
         id: parseInt(req.params.id)
     })
@@ -63,7 +60,6 @@ router.put('/:id',  taskValidationRules, async (req: Request, res: Response) => 
     } else {
         task.title = req.body.title || task.title;
         task.description = req.body.description || task.description;
-        task.completed = req.body.completed || task.completed;
 
         await taskRepository.save(task)
 
@@ -71,7 +67,7 @@ router.put('/:id',  taskValidationRules, async (req: Request, res: Response) => 
     }
 });
 
-router.delete('/:id', async (req: Request, res: Response) => {
+taskRouter.delete('/:id', async (req: Request, res: Response) => {
     const task = await taskRepository.findOneBy({
         id: parseInt(req.params.id)
     })
@@ -83,5 +79,3 @@ router.delete('/:id', async (req: Request, res: Response) => {
         res.status(204).send();
     }
 });
-
-export default router;

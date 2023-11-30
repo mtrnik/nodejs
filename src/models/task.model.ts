@@ -12,9 +12,6 @@ export class Task {
     @Column()
     description: string;
 
-    @Column()
-    completed: boolean;
-
     @ManyToOne(() => Author, (author) => author.tasks, {
         cascade: true,
     })

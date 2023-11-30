@@ -1,7 +1,7 @@
-import express, { Request, Response , Application } from 'express';
+import express, { Application } from 'express';
 import { AppDataSource } from "./data-source"
 
-import taskRoutes from './routes/task.route';
+import { authRouter, taskRouter } from "./routes";
 
 AppDataSource.initialize().then(async () => {
     const app: Application = express();
@@ -16,11 +16,8 @@ AppDataSource.initialize().then(async () => {
      * - Logging
      */
 
-    app.use('/tasks', taskRoutes);
-
-    app.get('/', (req: Request, res: Response) => {
-        res.send('Hello world in typescript 2');
-    });
+    app.use('/auth', authRouter);
+    app.use('/tasks', taskRouter);
 
     app.listen(port, () => {
         console.log(`Server is Fire at http://localhost:${port}`);
