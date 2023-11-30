@@ -1,9 +1,10 @@
 import {Request, Response} from "express";
 import {Repository} from "typeorm";
 import {hash, compare} from 'bcrypt'
+import {validationResult} from "express-validator";
+import { sign } from "jsonwebtoken";
 import {User} from "../models";
 import {AppDataSource} from "../data-source";
-import {validationResult} from "express-validator";
 
 export class AuthController {
 
@@ -13,15 +14,29 @@ export class AuthController {
     }
 
     async login(req: Request, res: Response) {
-        // const user = await this.userRepository.findOneBy({
-        //     email: req.body.email
-        // })
-        //
-        // if ( !user ) {
-        //     res.status(404).send('User not found');
-        // }
-        //
-        // await compare(req.body.password, user.password);
+        const user = await this.userRepository.findOneBy({
+            email: req.body.email
+        })
+
+        if ( !user ) {
+            return res.status(404).send('User not found');
+        }
+
+        const isCorrectPassword = await compare(req.body.password, user.password);
+
+        if ( isCorrectPassword ) {
+            const token = sign({
+                exp: Math.floor(Date.now() / 1000) + (60 * 60),
+                email: user.email,
+                id: user.id
+            }, 'secret');
+
+            res.json({
+                token
+            })
+        } else {
+            return res.status(401).send('Incorrect password');
+        }
     }
 
     async register(req: Request, res: Response) {
