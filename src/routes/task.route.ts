@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { body } from 'express-validator';
-import {TaskController} from "../controllers/task.controller";
+import {TaskController} from "../controllers";
 
 export const taskRouter = Router();
 
