@@ -2,6 +2,7 @@ import express, { Application } from 'express';
 import { AppDataSource } from "./data-source"
 
 import { authRouter, taskRouter } from "./routes";
+import {isAuthenticated} from "./middlewares/auth.middleware";
 
 AppDataSource.initialize().then(async () => {
     const app: Application = express();
@@ -11,12 +12,13 @@ AppDataSource.initialize().then(async () => {
 
     /**
      * TODO:
-     * - Auth,
-     * - Controllers?
+     * - Scraping
      * - Logging
      */
 
     app.use('/auth', authRouter);
+
+    app.use(isAuthenticated)
     app.use('/tasks', taskRouter);
 
     app.listen(port, () => {
