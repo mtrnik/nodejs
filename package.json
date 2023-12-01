@@ -20,8 +20,11 @@
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/got": "^9.6.12",
     "@types/jsonwebtoken": "^9.0.5",
     "bcrypt": "^5.1.1",
+    "cheerio": "^1.0.0-rc.12",
+    "got-cjs": "^12.5.4",
     "jsonwebtoken": "^9.0.2",
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.1.6",

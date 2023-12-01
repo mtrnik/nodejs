@@ -1,8 +1,8 @@
 import express, { Application } from 'express';
 import { AppDataSource } from "./data-source"
 
-import { authRouter, taskRouter } from "./routes";
-import {isAuthenticated} from "./middlewares/auth.middleware";
+import {authRouter, taskRouter, transfermarktRouter} from "./routes";
+// import {isAuthenticated} from "./middlewares/auth.middleware";
 
 AppDataSource.initialize().then(async () => {
     const app: Application = express();
@@ -20,6 +20,7 @@ AppDataSource.initialize().then(async () => {
 
     // app.use(isAuthenticated)
     app.use('/tasks', taskRouter);
+    app.use('/tm', transfermarktRouter);
 
     app.listen(port, () => {
         console.log(`Server is Fire at http://localhost:${port}`);
