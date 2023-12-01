@@ -18,7 +18,7 @@ AppDataSource.initialize().then(async () => {
 
     app.use('/auth', authRouter);
 
-    app.use(isAuthenticated)
+    // app.use(isAuthenticated)
     app.use('/tasks', taskRouter);
 
     app.listen(port, () => {

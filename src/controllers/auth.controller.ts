@@ -3,7 +3,7 @@ import {Repository} from "typeorm";
 import {hash, compare} from 'bcrypt'
 import {validationResult} from "express-validator";
 import { sign } from "jsonwebtoken";
-import {User} from "../models";
+import {User} from "../entities";
 import {AppDataSource} from "../data-source";
 
 export class AuthController {

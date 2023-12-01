@@ -2,7 +2,8 @@ import {Request, Response} from "express";
 import {Repository} from "typeorm";
 import {validationResult} from "express-validator";
 import {AppDataSource} from "../data-source";
-import {Author, Task} from "../models";
+import {Author, Task} from "../entities";
+import {RequestExtended, ResponseExtended} from "../interfaces";
 
 export class TaskController {
 
@@ -14,24 +15,24 @@ export class TaskController {
         this.taskRepository = AppDataSource.getRepository(Task)
     }
 
-    async getTasks (req: Request, res: Response) {
+    async getTasks (req: Request, res: Response<Task[]>) {
         const tasks = await this.taskRepository.find()
         res.json(tasks)
     }
 
-    async getTaskById(req: Request, res: Response){
+    async getTaskById(req: RequestExtended<{id: string}>, res: ResponseExtended<Task>){
         const task = await this.taskRepository.findOneBy({
             id: parseInt(req.params.id)
         })
 
         if (!task) {
-            res.status(404).send('Task not found');
+            res.status(404).json('Task not found');
         } else {
             res.json(task);
         }
     }
 
-    async createTask(req: Request, res: Response){
+    async createTask(req: RequestExtended<unknown, Task>, res: ResponseExtended<Task>){
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
@@ -50,7 +51,7 @@ export class TaskController {
         res.status(201).json(task);
     }
 
-    async updateTask(req: Request, res: Response){
+    async updateTask(req: RequestExtended<{id: string}, Task>, res: ResponseExtended<Task>){
         const task = await this.taskRepository.findOneBy({
             id: parseInt(req.params.id)
         })
@@ -67,7 +68,7 @@ export class TaskController {
         }
     }
 
-    async deleteTask(req: Request, res: Response){
+    async deleteTask(req: Request<{id: string}>, res: Response){
         const task = await this.taskRepository.findOneBy({
             id: parseInt(req.params.id)
         })

@@ -1,7 +1,7 @@
 import "reflect-metadata"
 import { DataSource } from "typeorm"
 
-import {Task, Author, User} from "./models";
+import {Task, Author, User} from "./entities";
 
 export const AppDataSource = new DataSource({
     type: "sqlite",
